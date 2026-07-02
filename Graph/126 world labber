@@ -1,0 +1,128 @@
+from typing import List
+from collections import deque
+
+class Node:
+    def __init__(self, word: str):
+        self.word = word
+        self.edges = set()
+
+    def add_edges(self, *nodes):
+        self.edges.update(nodes)
+
+    def __hash__(self):
+        return hash(self.word)
+
+    def __eq__(self, other):
+        return self.word == other.word
+
+    def __repr__(self):
+        return self.word
+
+
+def masks(word):
+    for i in range(len(word)):
+        yield word[:i] + "*" + word[i+1:]
+
+
+class Solution:
+    def findLadders(self, beginWord: str, endWord: str, wordList: List[str]) -> List[List[str]]:
+
+        wordmap = {}
+        neighbours = [None] * len(beginWord)
+
+        # Build Graph
+        for word in wordList:
+            if word in wordmap:
+                continue
+
+            node = Node(word)
+            wordmap[word] = node
+
+            i = 0
+            for mask in masks(word):
+                if mask not in wordmap:
+                    wordmap[mask] = Node(mask)
+
+                maskNode = wordmap[mask]
+                maskNode.add_edges(node)
+                neighbours[i] = maskNode
+                i += 1
+
+            node.add_edges(*neighbours)
+
+        # BFS
+        queue = deque()
+
+        for mask in masks(beginWord):
+            if mask in wordmap:
+                queue.append((3, wordmap[mask]))
+
+        found = False
+        touched = set()
+        levels = {}
+
+        while queue and not found:
+            for _ in range(len(queue)):
+                depth, node = queue.popleft()
+
+                if node.word == endWord:
+                    found = True
+                    break
+
+                if node in touched:
+                    continue
+
+                levels.setdefault(depth, set()).add(node)
+                touched.add(node)
+
+                for nxt in node.edges:
+                    if nxt not in touched:
+                        queue.append((depth + 1, nxt))
+
+        if not found:
+            return []
+
+        # Backtracking
+        result = []
+        stack = [(depth, wordmap[endWord], [endWord])]
+
+        while stack:
+            depth, node, path = stack.pop()
+
+            if depth == 3:
+                result.append([beginWord] + path)
+                continue
+
+            for nxt in node.edges:
+                if nxt not in levels[depth - 1]:
+                    continue
+
+                if depth % 2 == 1:
+                    new_path = [nxt.word] + path
+                else:
+                    new_path = path
+
+                stack.append((depth - 1, nxt, new_path))
+
+        return result
+
+
+beginWord = "hit"
+endWord = "cog"
+
+wordList = [
+    "hot",
+    "dot",
+    "dog",
+    "lot",
+    "log",
+    "cog"
+]
+
+obj = Solution()
+
+answer = obj.findLadders(beginWord, endWord, wordList)
+
+print("All Shortest Transformation Sequences:")
+for path in answer:
+    print(path)

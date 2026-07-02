@@ -1,0 +1,43 @@
+from collections import deque
+
+class Solution:
+
+    def shortestPathLength(self, graph):
+
+        n = len(graph)
+        allVisited = (1 << n) - 1
+
+        queue = deque()
+        visited = set()
+
+        # Start BFS from every node
+        for i in range(n):
+            mask = 1 << i
+            queue.append((i, mask, 0))
+            visited.add((i, mask))
+
+        while queue:
+            node, mask, dist = queue.popleft()
+
+            # All nodes visited
+            if mask == allVisited:
+                return dist
+
+            for nei in graph[node]:
+                newMask = mask | (1 << nei)
+
+                if (nei, newMask) not in visited:
+                    visited.add((nei, newMask))
+                    queue.append((nei, newMask, dist + 1))
+
+
+# Example
+graph = [
+    [1, 2, 3],
+    [0],
+    [0],
+    [0]
+]
+
+obj = Solution()
+print("Shortest Path Length =", obj.shortestPathLength(graph))
