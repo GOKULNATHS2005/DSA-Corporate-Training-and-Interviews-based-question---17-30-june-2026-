@@ -1,0 +1,50 @@
+class Solution:
+
+    def addOperators(self, num, target):
+
+        result = []
+
+        def backtrack(index, expression, value, prev):
+
+            if index == len(num):
+                if value == target:
+                    result.append(expression)
+                return
+
+            for i in range(index, len(num)):
+
+                # Skip numbers with leading zero
+                if i > index and num[index] == "0":
+                    break
+
+                current = num[index:i + 1]
+                currentNum = int(current)
+
+                if index == 0:
+                    backtrack(i + 1, current, currentNum, currentNum)
+                else:
+                    backtrack(i + 1,
+                              expression + "+" + current,
+                              value + currentNum,
+                              currentNum)
+
+                    backtrack(i + 1,
+                              expression + "-" + current,
+                              value - currentNum,
+                              -currentNum)
+
+                    backtrack(i + 1,
+                              expression + "*" + current,
+                              value - prev + prev * currentNum,
+                              prev * currentNum)
+
+        backtrack(0, "", 0, 0)
+        return result
+
+
+# Example
+num = "123"
+target = 6
+
+obj = Solution()
+print(obj.addOperators(num, target))
