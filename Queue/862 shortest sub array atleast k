@@ -1,0 +1,17 @@
+class Solution:
+    def shortestSubarray(self, nums: List[int], k: int) -> int:
+        '''
+        '''
+        curr, res = 0, float('inf')
+        hq = [(0,-1)]
+
+        for i, num in enumerate(nums):
+            curr += num
+            while hq and hq[0][0] <= curr-k:
+                res = min(res,i-hq[0][1])
+                heappop(hq)
+            heappush(hq,(curr,i))
+
+        if res == float('inf'):
+            return -1
+        return res
