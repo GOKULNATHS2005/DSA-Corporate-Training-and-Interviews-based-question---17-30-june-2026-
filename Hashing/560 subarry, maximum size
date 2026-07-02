@@ -1,0 +1,30 @@
+class Solution:
+
+    def subarraySum(self, nums, k):
+
+        prefixSum = 0
+        count = 0
+
+        # Stores prefix sum frequencies
+        prefix = {0: 1}
+
+        for num in nums:
+            prefixSum += num
+
+            if (prefixSum - k) in prefix:
+                count += prefix[prefixSum - k]
+
+            if prefixSum in prefix:
+                prefix[prefixSum] += 1
+            else:
+                prefix[prefixSum] = 1
+
+        return count
+
+
+# Example
+nums = [1, 1, 1]
+k = 2
+
+obj = Solution()
+print("Number of Subarrays =", obj.subarraySum(nums, k))
