@@ -1,0 +1,24 @@
+class Solution(object):
+    def removeKdigits(self, num, k):
+        stck=[]
+        if len(num)==k:
+            return("0")
+        else:
+            for i in range(len(num)):
+                while k!=0 and stck and stck[-1]>num[i]:
+                    stck.pop()
+                    k-=1
+                if not stck:
+                    stck.append(num[i])
+                elif k==0:
+                    stck.extend(num[i:])
+                    break
+                else:
+                    stck.append(num[i])
+
+            while k!=0:
+                stck.pop()
+                k-=1
+
+        result = "".join(stck).lstrip("0")
+        return(result if result else "0")
